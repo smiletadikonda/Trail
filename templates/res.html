@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Resume Processor</title>
+    <style>
+        body {
+            background: url("https://wallpaperboat.com/wp-content/uploads/2019/10/best-background-for-website-21.jpg");
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Poppins", sans-serif;
+        }
+        a {
+            text-decoration: none;
+        }
+        .container {
+            background-color: rgba(255, 255, 255, 0.8); /* semi-transparent white background */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* subtle shadow effect */
+            text-align: center;
+        }
+        input[type="file"],
+        input[type="submit"] {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #fd4766; /* pink color */
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        input[type="file"]:hover,
+        input[type="submit"]:hover {
+            background-color: #ff5a7d; /* lighter pink color on hover */
+        }
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <form method="post" enctype="multipart/form-data">
+        <h1>Upload Resume</h1>
+        <input type="file" name="file" id="file" required><br><br>
+        <input type="submit" value="Submit">
+    </form>
+</div>
+</body>
+</html>
