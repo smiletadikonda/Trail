@@ -36,6 +36,11 @@ def generate_data(data_type, key):
         return str(random.randint(10, 99))
     elif key.lower() == 'dob' or key.lower() == 'dateofbirth':
         return fake.date_of_birth().strftime('%Y-%m-%d')
+    elif key.lower() == 'userid':
+        return str(random.randint(100000000, 999999999))  # 9 digit number
+    elif key.lower() == 'phonenumber':
+        # Generating random phone number using the provided pattern
+        return fake.phone_number()
     elif data_type == 'string':
         return fake.word()
     elif data_type == 'number':
@@ -48,19 +53,27 @@ def generate_data(data_type, key):
         return None
 
 
+
 def generate_dummy_data(schema, num_outputs):
     dummy_data_list = []
 
     properties = schema.get('properties', {})
-
-    for _ in range(num_outputs):
-        dummy_data = {}
-
-        for key, prop in properties.items():
-            data_type = prop.get('type', 'string')
-            dummy_data[key] = generate_data(data_type, key)
-
-        dummy_data_list.append(dummy_data)
+    if not properties:
+        # If properties are not defined, generate data based on keys in the JSON object
+        keys = list(schema.keys())
+        for _ in range(num_outputs):
+            dummy_data = {}
+            for key in keys:
+                data_type = schema[key].get('type', 'string')
+                dummy_data[key] = generate_data(data_type, key)
+            dummy_data_list.append(dummy_data)
+    else:
+        for _ in range(num_outputs):
+            dummy_data = {}
+            for key, prop in properties.items():
+                data_type = prop.get('type', 'string')
+                dummy_data[key] = generate_data(data_type, key)
+            dummy_data_list.append(dummy_data)
 
     return dummy_data_list
 
