@@ -20,38 +20,57 @@ ALLOWED_EXTENSIONS = {'json'}
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-
 def generate_data(data_type, key):
+    first_name = None  # Initialize first name variable
+    middle_name = None  # Initialize middle name variable
+    last_name = None  # Initialize last name variable
+
     if key.lower() == 'last4ofsocial':
         return str(random.randint(1000, 9999))
     elif key.lower() == 'zipcode':
         return str(random.randint(10000, 99999))
     elif key.lower() == 'vacationcarryoverhours':
-        return str(random.randint(300, 500))
+        return str(random.randint(300, 499))
     elif key.lower() == 'monthofservice':
-        return str(random.randint(1, 12))
+        return str(random.randint(299, 499))
     elif key.lower() == 'payeeid':
         return str(random.randint(100000000, 999999999))
     elif key.lower() == 'sicktimeaccrualrate':
         return str(random.randint(10, 99))
     elif key.lower() == 'dob' or key.lower() == 'dateofbirth':
         return fake.date_of_birth().strftime('%Y-%m-%d')
-    elif key.lower() == 'userid':
-        return str(random.randint(100000000, 999999999))  # 9 digit number
-    elif key.lower() == 'phonenumber':
-        # Generating random phone number using the provided pattern
-        return fake.phone_number()
+    elif key.lower() == 'asofdate':
+        return fake.date_this_decade().strftime('%Y-%m-%d')  # Generating a date within the current decade
+    elif key.lower() == 'firstname':
+        first_name = fake.first_name()
+        return first_name
+    elif key.lower() == 'middlename':
+        middle_name = fake.first_name()
+        return middle_name
+    elif key.lower() == 'lastname':
+        last_name = fake.last_name()
+        return last_name
+    elif key.lower() == 'name':
+        if all([first_name, middle_name, last_name]):
+            return f"{first_name} {middle_name} {last_name}"
+        else:
+            return None
+    elif key.lower() == 'prefix':
+        return None
+    elif key.lower() == 'suffix':
+        return  None
+    elif key.lower() == 'department' or key.lower() == 'departmentofassignment':
+        return f"Department-{random.randint(1, 10)}"  # Assign random department from 1 to 10
     elif data_type == 'string':
         return fake.word()
     elif data_type == 'number':
-        return str(random.randint(10 ** 11, 10 ** 15))
+        return str(random.randint(300, 499))
     elif data_type == 'boolean':
         return str(random.choice([True, False]))
     elif data_type == 'date':
-        return fake.date_of_birth().strftime('%Y-%m-%d')
+        return fake.date_this_decade().strftime('%Y-%m-%d')  # Generating a date within the current decade
     else:
         return None
-
 
 
 def generate_dummy_data(schema, num_outputs):
@@ -63,16 +82,46 @@ def generate_dummy_data(schema, num_outputs):
         keys = list(schema.keys())
         for _ in range(num_outputs):
             dummy_data = {}
+            first_name = None
+            middle_name = None
+            last_name = None
             for key in keys:
                 data_type = schema[key].get('type', 'string')
-                dummy_data[key] = generate_data(data_type, key)
+                if key.lower() == 'firstname':
+                    first_name = generate_data(data_type, key)
+                elif key.lower() == 'middlename':
+                    middle_name = generate_data(data_type, key)
+                elif key.lower() == 'lastname':
+                    last_name = generate_data(data_type, key)
+                else:
+                    dummy_data[key] = generate_data(data_type, key)
+            dummy_data['FirstName'] = first_name
+            dummy_data['MiddleName'] = middle_name
+            dummy_data['LastName'] = last_name
+            dummy_data['Name'] = f"{first_name} {middle_name} {last_name}"
+            dummy_data['UserID'] = (first_name[0] + middle_name[0] + last_name[0]).upper() + '123456'  # Ensuring UserID is in capital letters and has 7 characters
             dummy_data_list.append(dummy_data)
     else:
         for _ in range(num_outputs):
             dummy_data = {}
+            first_name = None
+            middle_name = None
+            last_name = None
             for key, prop in properties.items():
                 data_type = prop.get('type', 'string')
-                dummy_data[key] = generate_data(data_type, key)
+                if key.lower() == 'firstname':
+                    first_name = generate_data(data_type, key)
+                elif key.lower() == 'middlename':
+                    middle_name = generate_data(data_type, key)
+                elif key.lower() == 'lastname':
+                    last_name = generate_data(data_type, key)
+                else:
+                    dummy_data[key] = generate_data(data_type, key)
+            dummy_data['FirstName'] = first_name
+            dummy_data['MiddleName'] = middle_name
+            dummy_data['LastName'] = last_name
+            dummy_data['Name'] = f"{first_name} {middle_name} {last_name}"
+            dummy_data['UserID'] = (first_name[0] + middle_name[0] + last_name[0]).upper() + '123456'  # Ensuring UserID is in capital letters and has 7 characters
             dummy_data_list.append(dummy_data)
 
     return dummy_data_list
@@ -88,14 +137,11 @@ def generate_delimited_output(data, delimiter=','):
     writer.writerows(data)
     return output.getvalue()
 
-
 def generate_txt_output(data):
     output = StringIO()
     for item in data:
         output.write(json.dumps(item) + '\n')
     return output.getvalue()
-
-
 
 @app.route('/generate_dummy_data', methods=['POST'])
 def generate_dummy_data_api():
@@ -187,7 +233,6 @@ def download_dummy_data():
             return send_file(filename, as_attachment=True, mimetype='text/plain')
     else:
         return jsonify({'error': 'Generated dummy data file not found'}), 404
-
 
 
 if __name__ == '__main__':
